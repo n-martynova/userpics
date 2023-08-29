@@ -57,32 +57,6 @@ const getUserId = () => {
   localStorage.setItem("userId", userId.value);
 }
 
-// const auth = () => {
-//   getUserId();
-
-//   return axios({
-//     url: `${url}/auth`,
-//     method: 'POST',
-//     data: {
-//       userId: userId.value
-//     }
-//   }).then(res => {
-//     isLoading.value = false;
-
-//     socket.on('qr', async (qr) => {
-//       isLoading.value = false;
-//       await nextTick();
-//       QRCode.toCanvas(canvas.value, qr, function (error) {
-//         if (error) console.error(error);
-//       })
-//     });
-//   })
-//   .catch(error => {
-//     console.log(error);
-//     auth();
-//   })
-// }
-
 const extractNumbers = () => {
   parsedNumbers.value = pasted.value.match(/\d{11}/g);
 }
@@ -111,8 +85,6 @@ const submitNumbers = async () => {
     return;
   }
 
-  // await loadTgContacts();
-
   await loadAvatars();
 
   isLoading.value = false;
@@ -133,25 +105,9 @@ const getUserpic = async (number) => {
   })
 }
 
-const loadTgContacts = async () => {
-  return axios({
-    url: `${url}/loadTgContacts`,
-    method: 'POST',
-    data: {
-      numbers: parsedNumbers.value
-    }
-  }).then(res => {
-    return res.data;
-  })
-  .catch(error => {
-    console.log(error)
-  })
-}
-
 onMounted(async () => {
-  // auth();
-  
   socket.on('qr', async (qr) => {
+    isLoading.value = false;
     isQRVisible.value = true;
 
     await nextTick();
