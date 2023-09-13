@@ -1,14 +1,7 @@
 {
-  "name": "userpics",
-  "version": "0.0.0",
-  "private": true,
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
   "dependencies": {
     "axios": "^1.4.0",
+    "eslint-plugin-json": "^3.1.0",
     "qrcode": "^1.5.3",
     "sass": "^1.64.2",
     "socket.io-client": "^4.7.1",
@@ -19,10 +12,20 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.2.3",
-    "eslint": "^8.45.0",
+    "eslint": "^8.49.0",
     "eslint-config-prettier": "^8.9.0",
+    "eslint-plugin-jsonc": "^2.9.0",
     "eslint-plugin-simple-import-sort": "^10.0.0",
     "eslint-plugin-vue": "^9.15.1",
     "vite": "^4.4.6"
-  }
+  },
+  "name": "userpics",
+  "private": true,
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "lint": "eslint --ext .js --ignore-path .gitignore .",
+    "preview": "vite preview"
+  },
+  "version": "0.0.0"
 }

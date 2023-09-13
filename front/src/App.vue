@@ -2,7 +2,7 @@
   <main>
     <h3 v-if="isLoading && !userpics.length" class="loading">Loading</h3>
     <div v-if="!isLoading && !parsedNumbers.length" class="textarea_container">
-      <textarea class="textarea" placeholder="Paste numbers here..." v-model="pasted" @keydown.enter.prevent="submitNumbers" />
+      <textarea v-model="pasted" class="textarea" placeholder="Paste numbers here..." @keydown.enter.prevent="submitNumbers" />
       <div class="submit" @click="submitNumbers">Submit!</div>
     </div>
     <div v-if="isQRVisible" class="qr-container">
@@ -16,6 +16,7 @@
     <div v-if="userpics.length" class="numbers">
       <div 
         v-for="(n, index) in parsedNumbers"
+        :key="n"
         class="user"
         :class="!userpics[index] && 'user--hidden'"
       >
@@ -31,11 +32,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue';
 import axios from 'axios';
 import QRCode from 'qrcode';
-import { socket } from './socket.js';
 import { v4 } from 'uuid';
+import { nextTick, onMounted, ref } from 'vue';
+
+import { socket } from './socket.js';
 
 const userId = ref('');
 const canvas = ref(null);
@@ -45,16 +47,16 @@ const isLoading = ref(true);
 const isQRVisible = ref(false);
 const numbersSent = ref(false);
 const pasted = ref('');
-const url = process.env.NODE_ENV === "production" ? "https://whatsapp-userpics.onrender.com" : "http://localhost:4000";
+const url = process.env.NODE_ENV === 'production' ? 'https://whatsapp-userpics.onrender.com' : 'http://localhost:4000';
 
 const getUserId = () => {
-  const savedUserId = localStorage.getItem("userId");
+  const savedUserId = localStorage.getItem('userId');
   if (savedUserId) {
     userId.value = savedUserId;
     return;
   }
   userId.value = v4();
-  localStorage.setItem("userId", userId.value);
+  localStorage.setItem('userId', userId.value);
 }
 
 const extractNumbers = () => {
@@ -67,8 +69,8 @@ const loadAvatars = async () => {
       return getUserpic(number);
     })
   ).then((pics) => {
-      userpics.value = pics;
-    }).catch(async (error) => {
+    userpics.value = pics;
+  }).catch(async (error) => {
     await auth();
     await loadAvatars();
   });
@@ -100,9 +102,9 @@ const getUserpic = async (number) => {
   }).then(res => {
     return res.data;
   })
-  .catch(error => {
-    console.log(error)
-  })
+    .catch(error => {
+      console.log(error)
+    })
 }
 
 onMounted(async () => {

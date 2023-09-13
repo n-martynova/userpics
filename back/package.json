@@ -1,6 +1,4 @@
 {
-    "name": "whatsapp_userpics",
-    "version": "1.0.0",
     "dependencies": {
         "@mtproto/core": "6.3.0",
         "body-parser": "^1.20.2",
@@ -15,12 +13,16 @@
         "whatsapp-web.js": "https://github.com/Julzk/whatsapp-web.js/tarball/jkr_hotfix_7",
         "wwebjs-mongo": "^1.1.0"
     },
-    "scripts": {
-        "start": "node index.js"
-    },
     "devDependencies": {
         "eslint": "^8.45.0",
         "eslint-config-prettier": "^8.9.0",
+        "eslint-plugin-jsonc": "^2.9.0",
         "eslint-plugin-simple-import-sort": "^10.0.0"
-    }
+    },
+    "name": "whatsapp_userpics",
+    "scripts": {
+        "lint": "eslint --ext .js --ignore-path .gitignore .",
+        "start": "node index.js"
+    },
+    "version": "1.0.0"
 }
