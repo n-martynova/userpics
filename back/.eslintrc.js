@@ -7,7 +7,7 @@ module.exports = {
     es6: true
   },
   plugins: ['simple-import-sort'],
-  extends: ['prettier', 'plugin:jsonc/recommended-with-jsonc'],
+  extends: ['plugin:jsonc/recommended-with-jsonc'],
   rules: {
     // @NOTE: Disabled because it breaks when importing types.
     //        But typescript does this better anyway, so it does not matter.
@@ -37,7 +37,6 @@ module.exports = {
     'eol-last': ['error', 'always'],
     'object-curly-spacing': ['error', 'always'],
     'comma-spacing': ['error', { before: false, after: true }],
-    'space-before-function-paren': ['off'], // конфликтует с prettier
     'brace-style': ['error', '1tbs', { allowSingleLine: true }],
     'max-len': [
       'error',
