@@ -1,125 +1,111 @@
 <template>
   <main>
-    <h3 v-if="isLoading && !userpics.length" class="loading">Loading</h3>
-    <div v-if="!isLoading && !parsedNumbers.length" class="textarea_container">
-      <textarea v-model="pasted" class="textarea" placeholder="Paste numbers here..." @keydown.enter.prevent="submitNumbers" />
-      <div class="submit" @click="submitNumbers">Submit!</div>
-    </div>
-    <div v-if="isQRVisible" class="qr-container">
-      <canvas 
-        v-if="isQRVisible"
-        ref="canvas" 
-        class="canvas"
+    <Loader v-if="isLoading && !users?.length" />
+    <template v-else>
+      <Form
+        v-if="!users?.length"
+        @submit="submitPhones"
       />
-    </div>
-    
-    <div v-if="userpics.length" class="numbers">
-      <div 
-        v-for="(n, index) in parsedNumbers"
-        :key="n"
-        class="user"
-        :class="!userpics[index] && 'user--hidden'"
-      >
-        <div class="phone">{{ n }}</div>
-        <img 
-          :src="userpics[index]"
-          width="250" 
-          height="250"
-        />
-      </div>
-    </div>
+      <QR 
+        v-if="qrCanvas" 
+        :qr="qrCanvas"
+      />
+      <Users
+        v-if="users?.length"
+        :total-length="parsedPhones.length"
+        :users="users"
+        @reload="reload"
+      />
+    </template>
   </main>
 </template>
 
 <script setup>
 import axios from 'axios';
-import QRCode from 'qrcode';
-import { v4 } from 'uuid';
-import { nextTick, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
+import Form from './components/Form.vue';
+import Loader from './components/Loader.vue';
+import QR from './components/QR.vue';
+import Users from './components/Users.vue';
 import { socket } from './socket.js';
 
-const userId = ref('');
-const canvas = ref(null);
-const parsedNumbers = ref([]);
-const userpics = ref([]);
 const isLoading = ref(true);
-const isQRVisible = ref(false);
-const numbersSent = ref(false);
-const pasted = ref('');
-const url = process.env.NODE_ENV === 'production' ? 'https://whatsapp-userpics.onrender.com' : 'http://localhost:4000';
+const phonesSent = ref(false);
+const qrCanvas = ref('');
+const users = ref([]);
+const parsedPhones = ref([]);
 
-const getUserId = () => {
-  const savedUserId = localStorage.getItem('userId');
-  if (savedUserId) {
-    userId.value = savedUserId;
-    return;
-  }
-  userId.value = v4();
-  localStorage.setItem('userId', userId.value);
-}
+const url = process.env.NODE_ENV === 'production' ? 'http://userpics.eba-jmzywxvn.eu-north-1.elasticbeanstalk.com' : 'http://localhost:4000';
+// const url = process.env.NODE_ENV === 'production' ? 'https://whatsapp-userpics.onrender.com' : 'http://localhost:4000';
 
-const extractNumbers = () => {
-  parsedNumbers.value = pasted.value.match(/\d{11}/g);
-}
-
-const loadAvatars = async () => {
-  await Promise.all(
-    parsedNumbers.value.map(async (number) => {
-      return getUserpic(number);
-    })
-  ).then((pics) => {
-    userpics.value = pics;
-  }).catch(async (error) => {
-    await auth();
-    await loadAvatars();
-  });
-}
-
-const submitNumbers = async () => {
+const submitPhones = async (pasted) => {
   isLoading.value = true;
-  numbersSent.value = true;
+  phonesSent.value = true;
 
-  extractNumbers();
+  parsedPhones.value = pasted.match(/\d{11}/g);
 
-  if (!parsedNumbers.value) {
+  if (!parsedPhones.value) {
     isLoading.value = false;
     return;
   }
 
-  await loadAvatars();
+  await getUserpics();
 
   isLoading.value = false;
 }
 
-const getUserpic = async (number) => {
+const getUserpics = async () => {
   return axios({
-    url: `${url}/getUserpic`,
+    url: `${url}/getUserpics`,
     method: 'POST',
-    data: {
-      id: `${number}@c.us`
-    }
-  }).then(res => {
-    return res.data;
+    data: parsedPhones.value,
   })
-    .catch(error => {
-      console.log(error)
+    .then((res) => {
+      users.value = res.data;
+      saveUsersToLocalStorage();
     })
+    .catch((error) => {
+      console.log('Loading failed, try again');
+    });
+};
+
+const saveUsersToLocalStorage = () => {
+  return localStorage.setItem('users', JSON.stringify(users.value));
+}
+
+const getUsersFromLocalStorage = () => {
+  return JSON.parse(localStorage.getItem('users') || '[]');
+}
+
+// const reload = () => {
+//   localStorage.removeItem('users');
+
+//   return axios({
+//     url: `${url}/reload`,
+//     method: 'GET',
+//   })
+//     .catch((error) => {
+//       console.log(error);
+//     });
+// }
+
+const reload = () => {
+  users.value = localStorage.removeItem('users');
 }
 
 onMounted(async () => {
-  socket.on('qr', async (qr) => {
-    isLoading.value = false;
-    isQRVisible.value = true;
+  users.value = getUsersFromLocalStorage();
+  if (users.value?.length) return;
 
-    await nextTick();
-    QRCode.toCanvas(canvas.value, qr, function (error) {
-      if (error) console.error(error);
-    })
+  socket.on('qr', async (qrCode) => {
+    isLoading.value = false;
+    qrCanvas.value = qrCode;
   });
 
   socket.on('client:ready', async () => {
-    isQRVisible.value = false;
+    console.log('ready socket')
+    qrCanvas.value = '';
     isLoading.value = false;
   });
 })
@@ -130,92 +116,5 @@ main {
   display: flex;
   flex-direction: row;
   align-items: stretch;
-}
-
-.textarea_container {
-  margin-right: 20px;
-}
-
-.textarea {
-  display: block;
-  height: 230px;
-  width: 350px;
-  padding: 5px;
-  margin-bottom: 10px;
-  font-size: 16px;
-}
-
-.submit {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 45px;
-  border: 1px solid #a4a2a2;
-  cursor: pointer;  
-  font-size: 21px;
-  background-color: #f6daf5;
-}
-
-.user {
-  display: flex;
-  padding: 15px 0;
-  flex-direction: row;
-  align-items: flex-start;
-  border-bottom: 1px solid #a4a2a2;
-
-  &--hidden {
-    display: none;
-  }
-}
-
-.qr-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: auto;
-  width: 280px;
-  position: relative;
-  border: 1px dashed #a4a2a2;
-}
-
-.qr-alt {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.phone {
-  width: 150px;
-  padding: 5px 0;
-  margin-right: 10px;
-  font-size: 19px;
-}
-
-.loading {
-  width: 200px;
-  &::after {
-    display: inline-block;
-    animation: dotty steps(1,end) 1s infinite;
-    content: '';
-  }
-}
-
-@keyframes dotty {
-  0%   { content: ''; }
-  25%  { content: '.'; }
-  50%  { content: '..'; }
-  75%  { content: '...'; }
-  100% { content: ''; }
-}
-
-.numbers {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 25px;
 }
 </style>

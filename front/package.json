@@ -13,7 +13,6 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.2.3",
     "eslint": "^8.49.0",
-    "eslint-config-prettier": "^8.9.0",
     "eslint-plugin-jsonc": "^2.9.0",
     "eslint-plugin-simple-import-sort": "^10.0.0",
     "eslint-plugin-vue": "^9.15.1",

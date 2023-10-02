@@ -1,7 +1,7 @@
 module.exports = {
   root: true,
   plugins: ['vue', 'simple-import-sort'],
-  extends: ['plugin:vue/vue3-recommended', 'prettier', 'plugin:jsonc/recommended-with-jsonc'],
+  extends: ['plugin:vue/vue3-recommended', 'plugin:jsonc/recommended-with-jsonc'],
   rules: {
     // @NOTE: Disabled because it breaks when importing types.
     //        But typescript does this better anyway, so it does not matter.
@@ -32,7 +32,6 @@ module.exports = {
 
     'object-curly-spacing': ['error', 'always'],
     'comma-spacing': ['error', { before: false, after: true }],
-    'space-before-function-paren': ['off'], // конфликтует с prettier
     'brace-style': ['error', '1tbs', { allowSingleLine: true }],
     'max-len': [
       'error',
@@ -46,6 +45,7 @@ module.exports = {
 
     // @NOTE: Vue
     'vue/attribute-hyphenation': 0,
+    'vue/max-attributes-per-line': 1,
     'vue/html-closing-bracket-newline': [
       'error',
       {
@@ -76,7 +76,7 @@ module.exports = {
     ],
     'vue/require-default-prop': 0,
     'vue/v-slot-style': 0,
-
+    'vue/multi-word-component-names': 0,
     'vue/v-on-event-hyphenation': [
       'error',
       'always',

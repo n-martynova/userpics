@@ -57,3 +57,19 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 45px;
+  border: 1px solid #a4a2a2;
+  cursor: pointer;
+  font-size: 21px;
+  background-color: #f6daf5;
+}
