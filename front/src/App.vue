@@ -1,9 +1,12 @@
 <template>
   <main>
+    <notifications
+      position="top center"
+    />
     <Loader v-if="isLoading && !users?.length" />
     <template v-else>
       <Form
-        v-if="!users?.length"
+        v-if="!users?.length && !qrCanvas"
         @submit="submitPhones"
       />
       <QR 
@@ -21,8 +24,9 @@
 </template>
 
 <script setup>
+import { notify } from '@kyvg/vue3-notification';
 import axios from 'axios';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 
 import Form from './components/Form.vue';
 import Loader from './components/Loader.vue';
@@ -37,7 +41,6 @@ const users = ref([]);
 const parsedPhones = ref([]);
 
 const url = process.env.NODE_ENV === 'production' ? 'http://userpics.eba-jmzywxvn.eu-north-1.elasticbeanstalk.com' : 'http://localhost:4000';
-// const url = process.env.NODE_ENV === 'production' ? 'https://whatsapp-userpics.onrender.com' : 'http://localhost:4000';
 
 const submitPhones = async (pasted) => {
   isLoading.value = true;
@@ -47,13 +50,17 @@ const submitPhones = async (pasted) => {
 
   if (!parsedPhones.value) {
     isLoading.value = false;
+    notify({
+      type: 'error',
+      title: 'No phone numbers found, check your input!'
+    });
     return;
   }
 
   await getUserpics();
 
   isLoading.value = false;
-}
+};
 
 const getUserpics = async () => {
   return axios({
@@ -65,34 +72,26 @@ const getUserpics = async () => {
       users.value = res.data;
       saveUsersToLocalStorage();
     })
-    .catch((error) => {
+    .catch(() => {
       console.log('Loading failed, try again');
     });
 };
 
 const saveUsersToLocalStorage = () => {
   return localStorage.setItem('users', JSON.stringify(users.value));
-}
+};
 
 const getUsersFromLocalStorage = () => {
   return JSON.parse(localStorage.getItem('users') || '[]');
-}
-
-// const reload = () => {
-//   localStorage.removeItem('users');
-
-//   return axios({
-//     url: `${url}/reload`,
-//     method: 'GET',
-//   })
-//     .catch((error) => {
-//       console.log(error);
-//     });
-// }
+};
 
 const reload = () => {
   users.value = localStorage.removeItem('users');
-}
+};
+
+watch(isLoading, (val) => {
+  console.log('isLoading', val);
+});
 
 onMounted(async () => {
   users.value = getUsersFromLocalStorage();
@@ -104,11 +103,10 @@ onMounted(async () => {
   });
 
   socket.on('client:ready', async () => {
-    console.log('ready socket')
     qrCanvas.value = '';
     isLoading.value = false;
   });
-})
+});
 </script>
 
 <style lang="scss" scoped>
@@ -116,5 +114,13 @@ main {
   display: flex;
   flex-direction: row;
   align-items: stretch;
+}
+
+:deep(.vue-notification) {
+  background-color: #f6daf5;
+  color: #000;
+  font-size: 17px;
+  border-left: none;
+  text-align: center;
 }
 </style>

@@ -1,9 +1,8 @@
 {
   "dependencies": {
+    "@kyvg/vue3-notification": "^3.0.2",
     "axios": "^1.4.0",
-    "eslint-plugin-json": "^3.1.0",
     "qrcode": "^1.5.3",
-    "sass": "^1.64.2",
     "socket.io-client": "^4.7.1",
     "telegram": "^2.18.26",
     "uuid": "^9.0.0",
@@ -16,7 +15,8 @@
     "eslint-plugin-jsonc": "^2.9.0",
     "eslint-plugin-simple-import-sort": "^10.0.0",
     "eslint-plugin-vue": "^9.15.1",
-    "vite": "^4.4.6"
+    "vite": "^4.4.6",
+    "sass": "^1.69.4"
   },
   "name": "userpics",
   "private": true,

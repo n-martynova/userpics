@@ -24,8 +24,8 @@ onMounted(async () => {
   await nextTick();
   QRCode.toCanvas(canvas.value, props.qr, function (error) {
     if (error) console.error(error);
-  })
-})
+  });
+});
 </script>
 
 <style lang="scss" scoped>

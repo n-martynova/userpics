@@ -58,6 +58,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+body.popup-open {
+  overflow: hidden;
+}
+
 .flex-column {
   display: flex;
   flex-direction: column;

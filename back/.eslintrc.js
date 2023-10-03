@@ -9,18 +9,6 @@ module.exports = {
   plugins: ['simple-import-sort'],
   extends: ['plugin:jsonc/recommended-with-jsonc'],
   rules: {
-    // @NOTE: Disabled because it breaks when importing types.
-    //        But typescript does this better anyway, so it does not matter.
-    'import/named': ['off'],
-
-    'vue/no-multiple-template-root': 0,
-    'vue/no-setup-props-destructure': 0,
-
-    // @NOTE: We can rely on hoisting
-    'no-use-before-define': ['off'],
-    'vue/no-v-html': 0,
-    'vue/valid-template-root': 0,
-
     // @NOTE: some of logs are okay
     'no-console': ['warn', { allow: ['info', 'warn', 'error'] }],
     // @NOTE: eslint fucks up with similar namespace and interface declarations
